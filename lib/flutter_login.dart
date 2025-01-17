@@ -176,9 +176,7 @@ class __HeaderState extends State<_Header> {
 
     renderParagraph.layout(const BoxConstraints());
 
-    return renderParagraph
-        .getMinIntrinsicHeight(widget.loginTheme.beforeHeroFontSize)
-        .ceilToDouble();
+    return renderParagraph.getMinIntrinsicHeight(widget.loginTheme.beforeHeroFontSize).ceilToDouble();
   }
 
   @override
@@ -314,6 +312,7 @@ class FlutterLogin extends StatefulWidget {
     this.onSwitchToAdditionalFields,
     this.initialIsoCode,
     this.keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
+    this.isSingleCardSignUp = false,
   })  : assert((logo is String?) || (logo is ImageProvider?)),
         logo = logo is String ? AssetImage(logo) : logo as ImageProvider?;
 
@@ -462,6 +461,10 @@ class FlutterLogin extends StatefulWidget {
 
   final ScrollViewKeyboardDismissBehavior keyboardDismissBehavior;
 
+  /// When true, the additional sign up fields to the same card of the credential
+  /// Default is false.
+  final bool isSingleCardSignUp;
+
   static String? defaultEmailValidator(String? value) {
     if (value == null || value.isEmpty || !email.hasMatch(value)) {
       return 'Invalid email!';
@@ -480,8 +483,7 @@ class FlutterLogin extends StatefulWidget {
   State<FlutterLogin> createState() => _FlutterLoginState();
 }
 
-class _FlutterLoginState extends State<FlutterLogin>
-    with TickerProviderStateMixin {
+class _FlutterLoginState extends State<FlutterLogin> with TickerProviderStateMixin {
   final GlobalKey<AuthCardState> authCardKey = GlobalKey();
 
   static const loadingDuration = Duration(milliseconds: 400);
@@ -575,9 +577,7 @@ class _FlutterLoginState extends State<FlutterLogin>
                     initialValue: _selectTimeDilation,
                     onChanged: (int index) {
                       setState(() {
-                        _selectTimeDilation = _AnimationTimeDilationDropdown
-                            .animationSpeeds[index]
-                            .toDouble();
+                        _selectTimeDilation = _AnimationTimeDilationDropdown.animationSpeeds[index].toDouble();
                       });
                     },
                   );
@@ -607,8 +607,7 @@ class _FlutterLoginState extends State<FlutterLogin>
           MaterialButton(
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             color: Colors.red,
-            onPressed: () =>
-                authCardKey.currentState!.runChangeRouteAnimation(),
+            onPressed: () => authCardKey.currentState!.runChangeRouteAnimation(),
             child: const Text('NAV', style: textStyle),
           ),
         ],
@@ -620,51 +619,32 @@ class _FlutterLoginState extends State<FlutterLogin>
     required ThemeData theme,
     required LoginTheme loginTheme,
   }) {
-    final blackOrWhite =
-        theme.brightness == Brightness.light ? Colors.black54 : Colors.white;
-    final primaryOrWhite = theme.brightness == Brightness.light
-        ? theme.primaryColor
-        : Colors.white;
+    final blackOrWhite = theme.brightness == Brightness.light ? Colors.black54 : Colors.white;
+    final primaryOrWhite = theme.brightness == Brightness.light ? theme.primaryColor : Colors.white;
     final originalPrimaryColor = loginTheme.primaryColor ?? theme.primaryColor;
     final primaryDarkShades = getDarkShades(originalPrimaryColor);
-    final primaryColor = primaryDarkShades.length == 1
-        ? lighten(primaryDarkShades.first!)
-        : primaryDarkShades.first;
-    final primaryColorDark = primaryDarkShades.length >= 3
-        ? primaryDarkShades[2]
-        : primaryDarkShades.last;
+    final primaryColor = primaryDarkShades.length == 1 ? lighten(primaryDarkShades.first!) : primaryDarkShades.first;
+    final primaryColorDark = primaryDarkShades.length >= 3 ? primaryDarkShades[2] : primaryDarkShades.last;
     final accentColor = loginTheme.accentColor ?? theme.colorScheme.secondary;
     final errorColor = loginTheme.errorColor ?? theme.colorScheme.error;
     // the background is a dark gradient, force to use white text if detect default black text color
-    final isDefaultBlackText = theme.textTheme.displaySmall!.color ==
-        Typography.blackMountainView.displaySmall!.color;
+    final isDefaultBlackText = theme.textTheme.displaySmall!.color == Typography.blackMountainView.displaySmall!.color;
     final titleStyle = theme.textTheme.displaySmall!
         .copyWith(
-          color: loginTheme.accentColor ??
-              (isDefaultBlackText
-                  ? Colors.white
-                  : theme.textTheme.displaySmall!.color),
+          color: loginTheme.accentColor ?? (isDefaultBlackText ? Colors.white : theme.textTheme.displaySmall!.color),
           fontSize: loginTheme.beforeHeroFontSize,
           fontWeight: FontWeight.w300,
         )
         .merge(loginTheme.titleStyle);
     final footerStyle = theme.textTheme.bodyLarge!
         .copyWith(
-          color: loginTheme.accentColor ??
-              (isDefaultBlackText
-                  ? Colors.white
-                  : theme.textTheme.displaySmall!.color),
+          color: loginTheme.accentColor ?? (isDefaultBlackText ? Colors.white : theme.textTheme.displaySmall!.color),
         )
         .merge(loginTheme.footerTextStyle);
-    final textStyle = theme.textTheme.bodyMedium!
-        .copyWith(color: blackOrWhite)
-        .merge(loginTheme.bodyStyle);
-    final textFieldStyle = theme.textTheme.titleMedium!
-        .copyWith(color: blackOrWhite, fontSize: 14)
-        .merge(loginTheme.textFieldStyle);
-    final buttonStyle = theme.textTheme.labelLarge!
-        .copyWith(color: Colors.white)
-        .merge(loginTheme.buttonStyle);
+    final textStyle = theme.textTheme.bodyMedium!.copyWith(color: blackOrWhite).merge(loginTheme.bodyStyle);
+    final textFieldStyle =
+        theme.textTheme.titleMedium!.copyWith(color: blackOrWhite, fontSize: 14).merge(loginTheme.textFieldStyle);
+    final buttonStyle = theme.textTheme.labelLarge!.copyWith(color: Colors.white).merge(loginTheme.buttonStyle);
     final cardTheme = loginTheme.cardTheme;
     final inputTheme = loginTheme.inputTheme;
     final buttonTheme = loginTheme.buttonTheme;
@@ -689,8 +669,7 @@ class _FlutterLoginState extends State<FlutterLogin>
         color: cardTheme.color ?? theme.cardColor,
         elevation: cardTheme.elevation ?? 12.0,
         margin: cardTheme.margin ?? const EdgeInsets.all(4.0),
-        shape: cardTheme.shape ??
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape: cardTheme.shape ?? RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       ),
       inputDecorationTheme: theme.inputDecorationTheme.copyWith(
         filled: inputTheme.filled,
@@ -699,8 +678,7 @@ class _FlutterLoginState extends State<FlutterLogin>
               primaryOrWhite.withOpacity(.07),
               Colors.grey.withOpacity(.04),
             ),
-        contentPadding: inputTheme.contentPadding ??
-            const EdgeInsets.symmetric(vertical: 4.0),
+        contentPadding: inputTheme.contentPadding ?? const EdgeInsets.symmetric(vertical: 4.0),
         errorStyle: inputTheme.errorStyle ?? TextStyle(color: errorColor),
         labelStyle: inputTheme.labelStyle ?? labelStyle,
         enabledBorder: inputTheme.enabledBorder ??
@@ -742,8 +720,7 @@ class _FlutterLoginState extends State<FlutterLogin>
         shape: buttonTheme.shape ?? const StadiumBorder(),
       ),
       // put it here because floatingActionButtonTheme doesnt have highlightColor property
-      highlightColor:
-          loginTheme.buttonTheme.highlightColor ?? theme.highlightColor,
+      highlightColor: loginTheme.buttonTheme.highlightColor ?? theme.highlightColor,
       textTheme: theme.textTheme.copyWith(
         displaySmall: titleStyle,
         bodyMedium: textStyle,
@@ -751,10 +728,7 @@ class _FlutterLoginState extends State<FlutterLogin>
         titleSmall: footerStyle,
         labelLarge: buttonStyle,
       ),
-      colorScheme: Theme.of(context)
-          .colorScheme
-          .copyWith(secondary: accentColor)
-          .copyWith(error: errorColor),
+      colorScheme: Theme.of(context).colorScheme.copyWith(secondary: accentColor).copyWith(error: errorColor),
     );
   }
 
@@ -765,14 +739,11 @@ class _FlutterLoginState extends State<FlutterLogin>
     final deviceSize = MediaQuery.of(context).size;
     final headerMargin = loginTheme.headerMargin ?? 15;
     final cardInitialHeight = loginTheme.cardInitialHeight ?? 300;
-    final cardTopPosition = loginTheme.cardTopPosition ??
-        max(deviceSize.height / 2 - cardInitialHeight / 2, 85);
+    final cardTopPosition = loginTheme.cardTopPosition ?? max(deviceSize.height / 2 - cardInitialHeight / 2, 85);
     final headerHeight = cardTopPosition - headerMargin;
-    final userValidator =
-        widget.userValidator ?? FlutterLogin.defaultEmailValidator;
+    final userValidator = widget.userValidator ?? FlutterLogin.defaultEmailValidator;
     final validateUserImmediately = widget.validateUserImmediately ?? false;
-    final passwordValidator =
-        widget.passwordValidator ?? FlutterLogin.defaultPasswordValidator;
+    final passwordValidator = widget.passwordValidator ?? FlutterLogin.defaultPasswordValidator;
 
     Widget footerWidget = const SizedBox();
     if (widget.footer != null) {
@@ -843,19 +814,15 @@ class _FlutterLoginState extends State<FlutterLogin>
                         onSubmit: _reverseHeaderAnimation,
                         onSubmitCompleted: widget.onSubmitAnimationCompleted,
                         hideSignUpButton: widget.onSignup == null,
-                        hideForgotPasswordButton:
-                            widget.hideForgotPasswordButton,
+                        hideForgotPasswordButton: widget.hideForgotPasswordButton,
                         loginAfterSignUp: widget.loginAfterSignUp,
                         hideProvidersTitle: widget.hideProvidersTitle,
                         additionalSignUpFields: widget.additionalSignupFields,
-                        disableCustomPageTransformer:
-                            widget.disableCustomPageTransformer,
+                        disableCustomPageTransformer: widget.disableCustomPageTransformer,
                         loginTheme: widget.theme,
-                        navigateBackAfterRecovery:
-                            widget.navigateBackAfterRecovery,
+                        navigateBackAfterRecovery: widget.navigateBackAfterRecovery,
                         scrollable: widget.scrollable,
-                        confirmSignupKeyboardType:
-                            widget.confirmSignupKeyboardType,
+                        confirmSignupKeyboardType: widget.confirmSignupKeyboardType,
                         introWidget: widget.headerWidget,
                         initialIsoCode: widget.initialIsoCode,
                       ),
@@ -875,8 +842,7 @@ class _FlutterLoginState extends State<FlutterLogin>
                 ),
               ),
             ),
-            if (!kReleaseMode && widget.showDebugButtons)
-              _buildDebugAnimationButtons(),
+            if (!kReleaseMode && widget.showDebugButtons) _buildDebugAnimationButtons(),
           ],
         ),
       ),
