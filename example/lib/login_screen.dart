@@ -56,8 +56,9 @@ class LoginScreen extends StatelessWidget {
       logoTag: Constants.logoTag,
       titleTag: Constants.titleTag,
       navigateBackAfterRecovery: true,
-      onConfirmRecover: _signupConfirm,
-      onConfirmSignup: _signupConfirm,
+      confirmSignupRequired: (_) async => false,
+      // onConfirmRecover: _signupConfirm,
+      // onConfirmSignup: _signupConfirm,
       loginAfterSignUp: false,
       loginProviders: [
         LoginProvider(
@@ -101,28 +102,10 @@ class LoginScreen extends StatelessWidget {
           linkUrl: 'https://github.com/NearHuscarl/flutter_login',
         ),
       ],
-      additionalSignupFields: [
-        const UserFormField(
+      additionalSignupFields: const [
+        UserFormField(
           keyName: 'Username',
           icon: Icon(FontAwesomeIcons.userLarge),
-        ),
-        const UserFormField(keyName: 'Name'),
-        const UserFormField(keyName: 'Surname'),
-        UserFormField(
-          keyName: 'phone_number',
-          displayName: 'Phone Number',
-          userType: LoginUserType.phone,
-          fieldValidator: (value) {
-            final phoneRegExp = RegExp(
-              '^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}\$',
-            );
-            if (value != null &&
-                value.length < 7 &&
-                !phoneRegExp.hasMatch(value)) {
-              return "This isn't a valid phone number";
-            }
-            return null;
-          },
         ),
       ],
       // scrollable: true,
@@ -275,6 +258,7 @@ class LoginScreen extends StatelessWidget {
         // Show new password dialog
       },
       headerWidget: const IntroWidget(),
+      isSingleCardSignUp: true,
     );
   }
 }

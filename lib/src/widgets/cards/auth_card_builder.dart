@@ -369,6 +369,8 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
             hideProvidersTitle: widget.hideProvidersTitle,
             introWidget: widget.introWidget,
             initialIsoCode: widget.initialIsoCode,
+            isSingleCardSignUp: true,
+            additionalSignUpFields: widget.additionalSignUpFields,
           ),
         );
       case _recoveryIndex:

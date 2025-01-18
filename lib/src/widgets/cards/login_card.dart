@@ -24,7 +24,7 @@ class _LoginCard extends StatefulWidget {
     this.introWidget,
     required this.initialIsoCode,
     this.isSingleCardSignUp = false,
-    this.additionalSignUpFields = const <UserFormField>[],
+    this.additionalSignUpFields,
   });
 
   final AnimationController loadingController;
@@ -45,7 +45,7 @@ class _LoginCard extends StatefulWidget {
   final Widget? introWidget;
   final String? initialIsoCode;
   final bool isSingleCardSignUp;
-  final List<UserFormField> additionalSignUpFields;
+  final List<UserFormField>? additionalSignUpFields;
 
   @override
   _LoginCardState createState() => _LoginCardState();
@@ -132,13 +132,13 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     });
 
     _nameControllers = {
-      for (final formField in widget.additionalSignUpFields)
+      for (final formField in widget.additionalSignUpFields ?? <UserFormField>[])
         formField.keyName: TextEditingController(
           text: formField.defaultValue,
         ),
     };
 
-    if (_nameControllers.length != widget.additionalSignUpFields.length) {
+    if (_nameControllers.length != widget.additionalSignUpFields?.length) {
       throw ArgumentError(
         'Some of the formFields have duplicated names, and this is not allowed.',
       );
@@ -257,7 +257,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
 
     if (auth.isSignup) {
       final requireSignUpConfirmation = await widget.requireSignUpConfirmation();
-      if (widget.requireAdditionalSignUpFields) {
+      if (widget.requireAdditionalSignUpFields && !widget.isSingleCardSignUp) {
         widget.onSwitchSignUpAdditionalData();
         // The login page wil be shown in login mode (used if loginAfterSignUp disabled)
         _switchAuthMode();
@@ -466,38 +466,39 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
   }
 
   List<Widget> _buildAdditionalSignUpFields({required double width}) {
-    return widget.additionalSignUpFields.map((UserFormField formField) {
-      return Column(
-        children: [
-          const SizedBox(
-            height: 10,
-          ),
-          AnimatedTextFormField(
-            userType: formField.userType,
-            controller: _nameControllers[formField.keyName],
-            // interval: _fieldAnimationIntervals[widget.formFields.indexOf(formField)],
-            loadingController: widget.loadingController,
-            width: width,
-            labelText: formField.displayName,
-            prefixIcon: formField.icon ?? const Icon(FontAwesomeIcons.solidCircleUser),
-            keyboardType: getKeyboardType(formField.userType),
-            autofillHints: [
-              getAutofillHints(formField.userType),
-            ],
-            textInputAction: formField.keyName == widget.additionalSignUpFields.last.keyName
-                ? TextInputAction.done
-                : TextInputAction.next,
-            validator: formField.fieldValidator,
-            tooltip: formField.tooltip,
+    return widget.additionalSignUpFields?.map((UserFormField formField) {
+          return Column(
+            children: [
+              const SizedBox(
+                height: 10,
+              ),
+              AnimatedTextFormField(
+                userType: formField.userType,
+                controller: _nameControllers[formField.keyName],
+                // interval: _fieldAnimationIntervals[widget.formFields.indexOf(formField)],
+                loadingController: widget.loadingController,
+                width: width,
+                labelText: formField.displayName,
+                prefixIcon: formField.icon ?? const Icon(FontAwesomeIcons.solidCircleUser),
+                keyboardType: getKeyboardType(formField.userType),
+                autofillHints: [
+                  getAutofillHints(formField.userType),
+                ],
+                textInputAction: formField.keyName == widget.additionalSignUpFields?.last.keyName
+                    ? TextInputAction.done
+                    : TextInputAction.next,
+                validator: formField.fieldValidator,
+                tooltip: formField.tooltip,
 
-            initialIsoCode: widget.initialIsoCode,
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-        ],
-      );
-    }).toList();
+                initialIsoCode: widget.initialIsoCode,
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+            ],
+          );
+        }).toList() ??
+        [];
   }
 
   Widget _buildForgotPassword(ThemeData theme, LoginMessages messages) {
