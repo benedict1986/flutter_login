@@ -209,10 +209,13 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
       );
     } else {
       if (!widget.requireAdditionalSignUpFields || widget.isSingleCardSignUp) {
+        auth.additionalSignupData = _nameControllers.map((key, value) => MapEntry(key, value.text));
+
         error = await auth.onSignup!(
           SignupData.fromSignupForm(
             name: auth.email,
             password: auth.password,
+            additionalSignupData: auth.additionalSignupData,
             termsOfService: auth.getTermsOfServiceResults(),
           ),
         );
